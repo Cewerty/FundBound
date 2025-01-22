@@ -346,18 +346,15 @@ contract Fund {
     }
 
     function checkIfFundingComplete(bytes32 projectID) public {
-    require(projectExists(projectID), "Project does not exist");
-    Project storage project = projects[projectID];
-    require(project.projectStatus == ProjectStatus.Active, "Project is not active");
-
-
-    if (block.timestamp >= project.deadline) {
-        if (project.funded >= project.final_goal) {
-
-            project.projectStatus = ProjectStatus.Funded;
-            emit ProjectStatusUpdated(projectID, ProjectStatus.Funded);
-
-            sendFunds(projectID);
+        require(projectExists(projectID), "Project does not exist");
+        Project storage project = projects[projectID];
+        require(project.projectStatus == ProjectStatus.Active, "Project is not active");
+        if (block.timestamp >= project.deadline) {
+            if (project.funded >= project.final_goal) {
+                project.projectStatus = ProjectStatus.Funded;
+                emit ProjectStatusUpdated(projectID, ProjectStatus.Funded);
+                
+                sendFunds(projectID);
         } else {
 
             project.projectStatus = ProjectStatus.Failed;
@@ -369,7 +366,6 @@ contract Fund {
         revert("Funding period is not over yet");
     }
 }
-
 
     function withdraw() public {
         uint256 amountToWithdraw = users_withdraw[msg.sender];
